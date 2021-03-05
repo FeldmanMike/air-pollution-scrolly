@@ -5,10 +5,65 @@ a {
 
 html,
 body {
-  background: #D6D6CE;
-  font-family: Verdana, Geneva, sans-serif;
+  /* background: #D6D6CE; */
+  font-family: Helvetica, sans-serif;
   height: 100%;
   margin: 0;
   padding: 0;
   width: 100%;
+}
+
+.text-container {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+}
+
+.long-text {
+  font-family: serif;
+  font-size: 20px;
+  line-height: 26px;
+}
+
+#page-container {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  margin-left: 37%;
+  margin-right: 37%;
+}
+
+
+#header {
+    background-color: #ececec;
+    height: 50px;
+    width: 100%;
+}
+
+#title-container {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+}
+
+#title-text {
+  font-family: Helvetica;
+  font-size: 55px;
+  font-weight: bold;
+  text-align: center;
+}
+
+#subtitle-text,
+#author-text {
+  font-family: sans-serif;
+  /* text-align: left; */
+}
+
+#subtitle-text {
+  font-size: 24px;
+}
+
+#author-text {
+  font-size: 14px;
+  font-weight: bold;
 }
