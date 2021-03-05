@@ -3,6 +3,7 @@
 // import MY_DATA from './app/data/example.json'
 
 // import {myExampleUtil} from './utils';
+import {scrollama} from 'scrollama';
 import {map} from 'd3-collection';
 import {csv, json} from 'd3-fetch';
 import {select} from 'd3-selection';
@@ -41,8 +42,14 @@ function fullMapVis(files) {
   const data = files[0];
   const counties = files[1];
   const states = files[2];
-
   const data_16 = data.filter(({Year}) => Number(Year) === 2016);
+
+  // from https://pudding.cool/process/introducing-scrollama/
+  var container = select('#scroll');
+  var graphic = container.select('.scroll__graphic');
+  var chart = graphic.select('.vis1');
+  var text = container.select('.scroll__text');
+  var step = text.selectAll('.step');
 
   console.log('here is data!');
   console.log(data_16);
