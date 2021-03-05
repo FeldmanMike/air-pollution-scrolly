@@ -9,7 +9,11 @@ import {select} from 'd3-selection';
 import {bin} from 'd3-array';
 import {geoPath, geoAlbersUsa} from 'd3-geo';
 import {scaleThreshold} from 'd3-scale';
-import {interpolateViridis, schemeBlues} from 'd3-scale-chromatic';
+import {
+  interpolateViridis,
+  schemeBlues,
+  schemeYlGnBu,
+} from 'd3-scale-chromatic';
 // this command imports the css file, if you remove it your css wont be applied!
 import './main.css';
 
@@ -17,6 +21,7 @@ import './main.css';
 Promise.all([
   csv('./data/cdc_air_pollution_counties.csv'),
   json('./data/us-counties.json'),
+  json('./data/us-states.json'),
 ]).then(files => fullMapVis(files));
 
 function createMapping(data, col1, col2) {
@@ -28,13 +33,14 @@ function createMapping(data, col1, col2) {
 }
 
 function fullMapVis(files) {
-  const width = 1000;
+  const width = 2000;
   const height = 500;
   const xDim = 'countyFIPS';
   const yDim = 'Value';
   const thresholds = [3, 6, 9, 12];
   const data = files[0];
   const counties = files[1];
+  const states = files[2];
 
   const data_16 = data.filter(({Year}) => Number(Year) === 2016);
 
@@ -53,12 +59,14 @@ function fullMapVis(files) {
   const path = geoPath().projection(projection);
 
   console.log('past projection!');
+  console.log('here are states!');
+  console.log(states);
 
   // Data and color scale
   const colorScale = scaleThreshold()
     .domain(thresholds)
     // .range(interpolateViridis[5]);
-    .range(schemeBlues[5]);
+    .range(schemeYlGnBu[5]);
 
   console.log('past color scale!');
   console.log(
@@ -88,4 +96,17 @@ function fullMapVis(files) {
       colorScale(new_data.get(d.properties.STATE + d.properties.COUNTY)),
     )
     .attr('d', path);
+  // .attr('transform', 'translate(0, 100)');
+
+  svg
+    .append('g')
+    .selectAll('path')
+    .data(states.features)
+    .enter()
+    .append('path')
+    .attr('fill', 'none')
+    .attr('stroke', '#646464')
+    .attr('stroke-linejoin', 'round')
+    .attr('d', path);
+  // .attr('transform', 'translate(0, 100)');
 }
