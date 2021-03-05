@@ -75,7 +75,7 @@ function fullMapVis(files) {
   );
 
   // Create svg
-  const svg = select('#app')
+  const svg = select('#vis1')
     .append('svg')
     // .attr('viewBox', [0, 0, 975, 610]);
     .attr('height', height)
@@ -87,11 +87,15 @@ function fullMapVis(files) {
   // used https://observablehq.com/@d3/choropleth
   // TODO - add state map
   svg
+    // .append('div')
+    // .attr('class', 'testing')
     .append('g')
     .selectAll('path')
     .data(counties.features)
     .enter()
     .append('path')
+    .attr('class', 'big-map')
+    // .attr('class', 'scroll__graphic')
     .attr('fill', d =>
       colorScale(new_data.get(d.properties.STATE + d.properties.COUNTY)),
     )
@@ -99,11 +103,15 @@ function fullMapVis(files) {
   // .attr('transform', 'translate(0, 100)');
 
   svg
+    // .append('div')
+    // .attr('class', 'testing')
     .append('g')
     .selectAll('path')
     .data(states.features)
     .enter()
     .append('path')
+    .attr('class', 'big-map')
+    // .attr('class', 'scroll__graphic')
     .attr('fill', 'none')
     .attr('stroke', '#646464')
     .attr('stroke-linejoin', 'round')
