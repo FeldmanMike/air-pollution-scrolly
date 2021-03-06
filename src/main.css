@@ -34,7 +34,7 @@ body {
   display: flex;
 }
 
-.scroll__graphic {
+/* .scroll__graphic {
   position: absolute;
   top: 0;
   left: 0;
@@ -42,8 +42,8 @@ body {
   width: 100%;
   /* -webkit-transform: translate3d(0, 0, 0);
   -moz-transform: translate3d(0, 0, 0); */
-  transform: translate3d(0, 0, 0);
-  }
+  /* transform: translate3d(0, 0, 0); */
+
 
 /* .scroll__graphic.is-fixed {
   position: fixed;
@@ -57,13 +57,14 @@ body {
 .scroll__graphic {
   position: sticky;
   right: 1rem;
-  top: 50%;
-  position: -webkit-sticky;
+  /* top: 50%; */
+  top: 0;
+  /* position: -webkit-sticky; */
   width: 100%;
   /* -moz-transform: translateY(-50%);
   -webkit-transform: translateY(-50%); */
-  transform: translateY(-25%);
-  margin-top: 20%;
+  transform: translateY(25%);
+  /* margin-top: 20%; */
 }
 
 .scroll__text {

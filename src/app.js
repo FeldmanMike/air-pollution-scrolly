@@ -1,3 +1,9 @@
+// TODO - wrangle pollution data so it's in JSON form:
+// keys are years, values are key/value pairs with countyFIPS & pollution value
+// (then I can do a global import)
+
+// then try and get scrolling + filtering to work (it should)
+
 // if the data you are going to import is small, then you can import it using es6 import
 // (I like to use use screaming snake case for imported json)
 // import MY_DATA from './app/data/example.json'
@@ -51,7 +57,7 @@ function createMapping(data, col1, col2) {
 // resize function to set dimensions on load and on page resize
 function handleResize() {
   // 1. update height of step elements for breathing room between steps
-  var stepHeight = Math.floor(window.innerHeight * 0.75);
+  var stepHeight = Math.floor(window.innerHeight * 0.5);
   step.style('height', stepHeight + 'px');
 
   // 2. update height of graphic element
@@ -80,6 +86,11 @@ function handleStepEnter(response) {
   step.classed('is-active', function(d, i) {
     return i === response.index;
   });
+
+  // update graphic based on step
+  // chart
+  // .select("div")
+  // .text(response.index + 1);
 
   // update graphic based on step here
   // var stepData = $step.attr('data-step')
@@ -129,6 +140,8 @@ function init() {
   window.addEventListener('resize', handleResize);
 }
 
+function updateMap() {}
+
 function fullMapVis(files) {
   const width = 2000;
   const height = 500;
@@ -139,12 +152,15 @@ function fullMapVis(files) {
   const counties = files[1];
   const states = files[2];
   const data_16 = data.filter(({Year}) => Number(Year) === 2001);
+  const data_02 = data.filter(({Year}) => Number(Year) === 2002);
+  const years = [...Array(16)].map((x, y) => 2001 + y);
 
   console.log('here is data!');
   console.log(data_16);
   console.log(counties.features);
   console.log('that was data!');
   var new_data = createMapping(data_16, xDim, yDim);
+  var new_data_02 = createMapping(data_02, xDim, yDim);
 
   console.log('this is new data!!!');
   console.log(new_data);
@@ -181,7 +197,6 @@ function fullMapVis(files) {
 
   //Bind data and create one path per GeoJSON feature
   // used https://observablehq.com/@d3/choropleth
-  // TODO - add state map
   svg
     // .append('div')
     // .attr('class', 'testing')
