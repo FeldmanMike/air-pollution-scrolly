@@ -6,7 +6,6 @@
 
 // if the data you are going to import is small, then you can import it using es6 import
 // (I like to use use screaming snake case for imported json)
-// import MY_DATA from './app/data/example.json'
 
 // import {myExampleUtil} from './utils';
 import scrollama from 'scrollama';
@@ -25,12 +24,21 @@ import {
 // this command imports the css file, if you remove it your css wont be applied!
 import './main.css';
 
+// console.log('air data is...');
+// console.log(air_data);
+// console.log('death data is...');
+// console.log(death_data);
+
 // from https://pudding.cool/process/introducing-scrollama/
 var container = select('#scroll1');
 var graphic = container.select('.scroll__graphic');
 var chart = graphic.select('#vis1');
 var text = container.select('.scroll__text');
 var step = text.selectAll('.step');
+const yearOne = 2001;
+const yearLast = 2014;
+const projection = geoAlbersUsa();
+const path = geoPath().projection(projection);
 
 console.log('graphic is...');
 console.log(graphic);
@@ -39,20 +47,51 @@ var scroller = scrollama();
 
 console.log(scroller);
 
+// Data and color scale
+const thresholds = [3, 6, 9, 12];
+const colorScale = scaleThreshold()
+  .domain(thresholds)
+  // .range(interpolateViridis[5]);
+  .range(schemeYlGnBu[5]);
+
 // add try/except
+// Promise(json('.data/us_air_pollution.json')).then(
+//   result => (test_data = result),
+// );
+//
+// console.log('data is...');
+// console.log(test_data);
+
 Promise.all([
-  csv('./data/cdc_air_pollution_counties.csv'),
+  // csv('./data/cdc_air_pollution_counties.csv'),
+  json('./data/us_air_pollution.json'),
   json('./data/us-counties.json'),
   json('./data/us-states.json'),
 ]).then(files => fullMapVis(files));
 
-function createMapping(data, col1, col2) {
-  const rv = new Map();
-  for (let i = 0; i < data.length; i++) {
-    rv.set(data[i][col1], +data[i][col2]);
-  }
-  return rv;
-}
+// function createMapping(data, col1, col2) {
+//   const rv = new Map();
+//   for (let i = 0; i < data.length; i++) {
+//     rv.set(data[i][col1], +data[i][col2]);
+//   }
+//   return rv;
+// }
+
+// function createMapping(data, i, col1, col2) {
+//   const rv = new Map();
+//   for (let j = 0; j < data.length; j++) {
+//     rv.set(data[i][j][col1], +data[i][j][col2]);
+//   }
+//   return rv;
+// }
+
+// function processPollutionData(data, firstYear, maxYear) {
+//   var rv = new Array();
+//   for (let i = firstYear; i < maxYear + 1; i++) {
+//     rv.push(new Map(Object.entries(data[i])));
+//   }
+//   return rv;
+// }
 
 // resize function to set dimensions on load and on page resize
 function handleResize() {
@@ -86,9 +125,30 @@ function handleStepEnter(response) {
   step.classed('is-active', function(d, i) {
     return i === response.index;
   });
+  console.log('response index is...');
+  console.log(response.index);
 
+  console.log(response.index + yearOne);
   // update graphic based on step
-  // chart
+
+  console.log('about to update chart...');
+  chart
+    // .append('g')
+    .selectAll('path')
+    .data(window.globCounties.features)
+    // .enter()
+    // .append('path')
+    // .attr('class', 'big-map')
+    // .attr('class', 'scroll__graphic')
+    .attr('fill', d =>
+      colorScale(
+        window.globAirData[yearOne + response.index][
+          +(d.properties.STATE + d.properties.COUNTY)
+        ],
+      ),
+    );
+  console.log('chart updated!');
+  // .attr('d', path);
   // .select("div")
   // .text(response.index + 1);
 
@@ -140,30 +200,19 @@ function init() {
   window.addEventListener('resize', handleResize);
 }
 
-function updateMap() {}
+// function updateMap() {}
 
 function fullMapVis(files) {
   const width = 2000;
   const height = 500;
   const xDim = 'countyFIPS';
   const yDim = 'Value';
-  const thresholds = [3, 6, 9, 12];
   const data = files[0];
   const counties = files[1];
   const states = files[2];
-  const data_16 = data.filter(({Year}) => Number(Year) === 2001);
-  const data_02 = data.filter(({Year}) => Number(Year) === 2002);
-  const years = [...Array(16)].map((x, y) => 2001 + y);
-
-  console.log('here is data!');
-  console.log(data_16);
-  console.log(counties.features);
-  console.log('that was data!');
-  var new_data = createMapping(data_16, xDim, yDim);
-  var new_data_02 = createMapping(data_02, xDim, yDim);
-
-  console.log('this is new data!!!');
-  console.log(new_data);
+  window.globAirData = data;
+  window.globCounties = counties;
+  // window.globStates = states;
 
   // Map and projection
   console.log('past path!');
@@ -173,12 +222,6 @@ function fullMapVis(files) {
   console.log('past projection!');
   console.log('here are states!');
   console.log(states);
-
-  // Data and color scale
-  const colorScale = scaleThreshold()
-    .domain(thresholds)
-    // .range(interpolateViridis[5]);
-    .range(schemeYlGnBu[5]);
 
   console.log('past color scale!');
   console.log(
@@ -208,7 +251,7 @@ function fullMapVis(files) {
     .attr('class', 'big-map')
     // .attr('class', 'scroll__graphic')
     .attr('fill', d =>
-      colorScale(new_data.get(d.properties.STATE + d.properties.COUNTY)),
+      colorScale(data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]),
     )
     .attr('d', path);
   // .attr('transform', 'translate(0, 100)');
