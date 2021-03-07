@@ -96,7 +96,7 @@ Promise.all([
 // resize function to set dimensions on load and on page resize
 function handleResize() {
   // 1. update height of step elements for breathing room between steps
-  var stepHeight = Math.floor(window.innerHeight * 0.5);
+  var stepHeight = Math.floor(window.innerHeight * 0.4);
   step.style('height', stepHeight + 'px');
 
   // 2. update height of graphic element
