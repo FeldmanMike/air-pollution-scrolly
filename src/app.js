@@ -11,23 +11,20 @@
 import scrollama from 'scrollama';
 // import {onStepEnter, onContainerEnter, onContainerExit} from 'scrollama';
 import {map} from 'd3-collection';
+
+// from https://github.com/jbkunst/d3-waffle/blob/master/d3-waffle.js
 import {csv, json} from 'd3-fetch';
 import {select} from 'd3-selection';
 import {bin} from 'd3-array';
 import {geoPath, geoAlbersUsa} from 'd3-geo';
-import {scaleThreshold} from 'd3-scale';
+import {extent} from 'd3-array';
+import {scaleThreshold, scaleOrdinal} from 'd3-scale';
 import {
   interpolateViridis,
   schemeBlues,
   schemeYlGnBu,
 } from 'd3-scale-chromatic';
-// this command imports the css file, if you remove it your css wont be applied!
 import './main.css';
-
-// console.log('air data is...');
-// console.log(air_data);
-// console.log('death data is...');
-// console.log(death_data);
 
 // from https://pudding.cool/process/introducing-scrollama/
 var container = select('#scroll1');
@@ -40,12 +37,14 @@ const yearLast = 2014;
 const projection = geoAlbersUsa();
 const path = geoPath().projection(projection);
 
-console.log('graphic is...');
-console.log(graphic);
+// var chart = d3waffle();
+
+// console.log('graphic is...');
+// console.log(graphic);
 
 var scroller = scrollama();
 
-console.log(scroller);
+// console.log(scroller);
 
 // Data and color scale
 const thresholds = [3, 6, 9, 12];
@@ -54,44 +53,14 @@ const colorScale = scaleThreshold()
   // .range(interpolateViridis[5]);
   .range(schemeYlGnBu[5]);
 
-// add try/except
-// Promise(json('.data/us_air_pollution.json')).then(
-//   result => (test_data = result),
-// );
-//
-// console.log('data is...');
-// console.log(test_data);
-
 Promise.all([
-  // csv('./data/cdc_air_pollution_counties.csv'),
   json('./data/us_air_pollution.json'),
   json('./data/us-counties.json'),
   json('./data/us-states.json'),
+  json('./data/us_air_deaths.json'),
+  json('./data/cumul_air_deaths.json'),
+  json('./data/waffle_boxes.json'),
 ]).then(files => fullMapVis(files));
-
-// function createMapping(data, col1, col2) {
-//   const rv = new Map();
-//   for (let i = 0; i < data.length; i++) {
-//     rv.set(data[i][col1], +data[i][col2]);
-//   }
-//   return rv;
-// }
-
-// function createMapping(data, i, col1, col2) {
-//   const rv = new Map();
-//   for (let j = 0; j < data.length; j++) {
-//     rv.set(data[i][j][col1], +data[i][j][col2]);
-//   }
-//   return rv;
-// }
-
-// function processPollutionData(data, firstYear, maxYear) {
-//   var rv = new Array();
-//   for (let i = firstYear; i < maxYear + 1; i++) {
-//     rv.push(new Map(Object.entries(data[i])));
-//   }
-//   return rv;
-// }
 
 // resize function to set dimensions on load and on page resize
 function handleResize() {
@@ -125,21 +94,16 @@ function handleStepEnter(response) {
   step.classed('is-active', function(d, i) {
     return i === response.index;
   });
-  console.log('response index is...');
-  console.log(response.index);
-
-  console.log(response.index + yearOne);
+  // console.log('response index is...');
+  // console.log(response.index);
+  //
+  // console.log(response.index + yearOne);
   // update graphic based on step
 
-  console.log('about to update chart...');
+  // console.log('about to update chart...');
   chart
-    // .append('g')
     .selectAll('path')
     .data(window.globCounties.features)
-    // .enter()
-    // .append('path')
-    // .attr('class', 'big-map')
-    // .attr('class', 'scroll__graphic')
     .attr('fill', d =>
       colorScale(
         window.globAirData[yearOne + response.index][
@@ -147,39 +111,14 @@ function handleStepEnter(response) {
         ],
       ),
     );
-  console.log('chart updated!');
-  // .attr('d', path);
-  // .select("div")
-  // .text(response.index + 1);
-
-  // update graphic based on step here
-  // var stepData = $step.attr('data-step')
-  // ...
+  // console.log('chart updated!');
 }
-
-// function handleContainerEnter(response) {
-//   // response = { direction }
-//
-//   // sticky the graphic
-//   graphic.classed('is-fixed', true);
-//   graphic.classed('is-bottom', false);
-// }
-//
-// function handleContainerExit(response) {
-//   // response = { direction }
-//
-//   // un-sticky the graphic, and pin to top/bottom of container
-//   graphic.classed('is-fixed', false);
-//   graphic.classed('is-bottom', response.direction === 'down');
-// }
 
 // kick-off code to run once on load
 function init() {
   // 1. call a resize on load to update width/height/position of elements
   // setupStickyfill();
   handleResize();
-
-  console.log('Is the error before this?');
 
   // 2. setup the scrollama instance
   // 3. bind scrollama event handlers (this can be chained like below)
@@ -210,24 +149,32 @@ function fullMapVis(files) {
   const data = files[0];
   const counties = files[1];
   const states = files[2];
+  const deaths = files[3];
+  const cumul_deaths = files[4];
+  const boxes = files[5];
+  // const years = Object.keys(boxes);
+  // const numBoxes = Object.values(boxes);
+  // console.log('boxes are...');
+  // console.log(boxes);
+
   window.globAirData = data;
   window.globCounties = counties;
   // window.globStates = states;
 
   // Map and projection
-  console.log('past path!');
+  // console.log('past path!');
   const projection = geoAlbersUsa();
   const path = geoPath().projection(projection);
 
-  console.log('past projection!');
-  console.log('here are states!');
-  console.log(states);
+  // console.log('past projection!');
+  // console.log('here are states!');
+  // console.log(states);
 
-  console.log('past color scale!');
-  console.log(
-    counties.features[0].properties.STATE +
-      counties.features[0].properties.COUNTY,
-  );
+  // console.log('past color scale!');
+  // console.log(
+  //   counties.features[0].properties.STATE +
+  //     counties.features[0].properties.COUNTY,
+  // );
 
   // Create svg
   const svg = select('#vis1')
@@ -241,37 +188,101 @@ function fullMapVis(files) {
   //Bind data and create one path per GeoJSON feature
   // used https://observablehq.com/@d3/choropleth
   svg
-    // .append('div')
-    // .attr('class', 'testing')
     .append('g')
     .selectAll('path')
     .data(counties.features)
     .enter()
     .append('path')
     .attr('class', 'big-map')
-    // .attr('class', 'scroll__graphic')
     .attr('fill', d =>
       colorScale(data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]),
     )
     .attr('d', path);
-  // .attr('transform', 'translate(0, 100)');
 
   svg
-    // .append('div')
-    // .attr('class', 'testing')
     .append('g')
     .selectAll('path')
     .data(states.features)
     .enter()
     .append('path')
     .attr('class', 'big-map')
-    // .attr('class', 'scroll__graphic')
     .attr('fill', 'none')
     .attr('stroke', '#646464')
     .attr('stroke-linejoin', 'round')
     .attr('d', path);
-  // .attr('transform', 'translate(0, 100)');
+
+  const widthSquares = 20;
+  const heightSquares = 5;
+  const squareSize = 25;
+  const squareValue = 0;
+  const gap = 1;
+
+  //remap data
+  function groupBy(data, accessorKey) {
+    const rv = {};
+    for (let i = 0; i < data.length; i++) {
+      arr = rv[data[i][accessorKey]];
+      // Referenced this SO post on undefined: https://stackoverflow.com/questions/4186906/check-if-object-exists-in-javascript
+      if (typeof arr != 'undefined') {
+        arr.push(data[i]);
+      } else {
+        rv[data[i][accessorKey]] = [];
+        rv[data[i][accessorKey]].push(data[i]);
+      }
+    }
+    return rv;
+  }
+  function rectArray(data) {
+    var boxNums = new Array();
+    for (let i = yearOne; i < yearLast + 1; i++) {
+      console.log('data value is...');
+      console.log(data[i]);
+      boxNums.push(
+        Array(data[i] + 1)
+          .join(1)
+          .split('')
+          .map(function() {
+            return {units: data[i], groupIndex: i};
+          }),
+      );
+    }
+    return boxNums;
+  }
+
+  var boxData = rectArray(boxes);
+  console.log('box data is...');
+  console.log(boxData);
+
+  const width_waf = squareSize * widthSquares + widthSquares * gap + 25;
+  const height_waf = squareSize * heightSquares + heightSquares * gap + 25;
+
+  var waffle = select('#waffle')
+    .append('svg')
+    .attr('width', width_waf)
+    .attr('height', height_waf);
+
+  console.log('boxes are...');
+  console.log(boxes);
+
+  waffle
+    .append('g')
+    .selectAll('div')
+    .data(boxData)
+    .enter()
+    .append('rect')
+    .attr('width', squareSize)
+    .attr('height', squareSize)
+    .attr('fill', '#8B0000')
+    .attr('x', function(d, i) {
+      //group n squares for column
+      var col = Math.floor(i / heightSquares);
+      // console.log('i is...');
+      // console.log(i);
+      return col * squareSize + col * gap;
+    })
+    .attr('y', function(d, i) {
+      var row = i % heightSquares;
+      return heightSquares * squareSize - (row * squareSize + row * gap);
+    });
   init();
 }
-
-// init();

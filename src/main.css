@@ -105,6 +105,30 @@ body {
   margin-right: 37%;
 }
 
+/* From https://codepen.io/will-r-chase/pen/arGoxw */
+/* .waffle-container {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  margin: 10px;
+  width: 200px;
+  height: 500px;
+  justify-content: flex-start;
+  align-content: flex-start;
+}
+
+#waffle-box {
+  width: 10px;
+  height: 10px;
+  margin: 2px;
+  z-index: 0;
+  background-color: #FF7373;
+  position: relative;
+  -moz-border-radius: 1px;
+  -webkit-border-radius: 1px;
+  border-radius: 1px;
+  transform: scale(0);
+} */
+
 
 #header {
     background-color: #ececec;
