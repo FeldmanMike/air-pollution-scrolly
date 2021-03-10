@@ -211,8 +211,8 @@ function fullMapVis(files) {
     .attr('stroke-linejoin', 'round')
     .attr('d', path);
 
-  const widthSquares = 20;
-  const heightSquares = 5;
+  const widthSquares = 10;
+  const heightSquares = 14;
   const squareSize = 25;
   const squareValue = 0;
   const gap = 1;
@@ -259,7 +259,8 @@ function fullMapVis(files) {
   var waffle = select('#waffle')
     .append('svg')
     .attr('width', width_waf)
-    .attr('height', height_waf);
+    .attr('height', height_waf)
+    .attr('transform', 'translate(1100, -270)');
 
   console.log('boxes are...');
   console.log(boxes);
@@ -267,7 +268,7 @@ function fullMapVis(files) {
   waffle
     .append('g')
     .selectAll('div')
-    .data(boxData)
+    .data(boxData[0])
     .enter()
     .append('rect')
     .attr('width', squareSize)
