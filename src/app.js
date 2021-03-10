@@ -9,6 +9,7 @@
 
 // import {myExampleUtil} from './utils';
 import scrollama from 'scrollama';
+import {transition} from 'd3-transition';
 // import {onStepEnter, onContainerEnter, onContainerExit} from 'scrollama';
 import {map} from 'd3-collection';
 
@@ -30,12 +31,18 @@ import './main.css';
 var container = select('#scroll1');
 var graphic = container.select('.scroll__graphic');
 var chart = graphic.select('#vis1');
+var waffChart = graphic.select('#waffle');
 var text = container.select('.scroll__text');
 var step = text.selectAll('.step');
 const yearOne = 2001;
 const yearLast = 2014;
 const projection = geoAlbersUsa();
 const path = geoPath().projection(projection);
+const widthSquares = 10;
+const heightSquares = 14;
+const squareSize = 25;
+const squareValue = 0;
+const gap = 1;
 
 // var chart = d3waffle();
 
@@ -104,6 +111,8 @@ function handleStepEnter(response) {
   chart
     .selectAll('path')
     .data(window.globCounties.features)
+    .transition()
+    .duration(400)
     .attr('fill', d =>
       colorScale(
         window.globAirData[yearOne + response.index][
@@ -111,6 +120,43 @@ function handleStepEnter(response) {
         ],
       ),
     );
+
+  waffChart
+    .selectAll('g')
+    .selectAll('rect')
+    .data(window.numBoxes[response.index])
+    .exit()
+    .transition()
+    .duration(400)
+    .style('opacity', 0)
+    .remove();
+
+  waffChart
+    .selectAll('g')
+    .selectAll('rect')
+    .data(window.numBoxes[response.index])
+    .enter()
+    .append('rect')
+    .merge(waffChart)
+    .transition()
+    .duration(400)
+    .attr('width', squareSize)
+    .attr('height', squareSize)
+    .attr('fill', '#8B0000')
+    .attr('x', function(d, i) {
+      //group n squares for column
+      var col = Math.floor(i / heightSquares);
+      // console.log('i is...');
+      // console.log(i);
+      return col * squareSize + col * gap;
+    })
+    .attr('y', function(d, i) {
+      var row = i % heightSquares;
+      return heightSquares * squareSize - (row * squareSize + row * gap);
+    });
+
+  waffChart;
+
   // console.log('chart updated!');
 }
 
@@ -211,12 +257,6 @@ function fullMapVis(files) {
     .attr('stroke-linejoin', 'round')
     .attr('d', path);
 
-  const widthSquares = 10;
-  const heightSquares = 14;
-  const squareSize = 25;
-  const squareValue = 0;
-  const gap = 1;
-
   //remap data
   function groupBy(data, accessorKey) {
     const rv = {};
@@ -250,17 +290,18 @@ function fullMapVis(files) {
   }
 
   var boxData = rectArray(boxes);
+  window.numBoxes = boxData;
   console.log('box data is...');
   console.log(boxData);
 
-  const width_waf = squareSize * widthSquares + widthSquares * gap + 25;
-  const height_waf = squareSize * heightSquares + heightSquares * gap + 25;
+  const width_waf = squareSize * widthSquares + widthSquares * gap + 200;
+  const height_waf = squareSize * heightSquares + heightSquares * gap + 75;
 
   var waffle = select('#waffle')
     .append('svg')
     .attr('width', width_waf)
     .attr('height', height_waf)
-    .attr('transform', 'translate(1100, -270)');
+    .attr('transform', 'translate(1000, -270)');
 
   console.log('boxes are...');
   console.log(boxes);
