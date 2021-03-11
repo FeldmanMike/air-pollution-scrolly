@@ -21,8 +21,8 @@ body {
 
 .long-text {
   font-family: serif;
-  font-size: 20px;
-  line-height: 26px;
+  font-size: 22px;
+  line-height: 31px;
 }
 
 
@@ -101,8 +101,10 @@ body {
   display: flex;
   flex-flow: column;
   justify-content: center;
-  margin-left: 37%;
-  margin-right: 37%;
+  width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5%;
 }
 
 /* From https://codepen.io/will-r-chase/pen/arGoxw */
@@ -134,19 +136,29 @@ body {
     background-color: #ececec;
     height: 50px;
     width: 100%;
+    margin-bottom: 2%;
 }
 
 #title-container {
   display: flex;
   flex-flow: column;
-  justify-content: center;
+  margin-bottom: 2%;
+  /* justify-content: center; */
+}
+
+#title-text-container {
+  display: flex;
+  flex-flow: column;
+  margin-bottom: 2%;
 }
 
 #title-text {
   font-family: Helvetica;
-  font-size: 55px;
+  font-size: 40px;
+  line-height: 50px;
   font-weight: bold;
-  text-align: center;
+  font-style: italic;
+  /* text-align: center; */
 }
 
 #subtitle-text,
@@ -157,6 +169,7 @@ body {
 
 #subtitle-text {
   font-size: 24px;
+  line-height: 30px;
 }
 
 #author-text {
