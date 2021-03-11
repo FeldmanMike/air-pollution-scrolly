@@ -361,14 +361,15 @@ function handleStepEnter2(response) {
   // const [[left, top], [right, bottom]]
   // const [[x0, y0], [x1, y1]] = path.bounds(d);
   const [[x0, y0], [x1, y1]] = [
-    [32, 170],
-    [90, 400],
+    [32, 140],
+    [40, 325],
   ];
-  const width = 2000;
+  const width = 1000;
   const height = 500;
+
   var transform = zoomIdentity
     .translate(width / 2, height / 2)
-    .scale(Math.min(8, 0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)))
+    .scale(0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height))
     .translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
 
   step2.classed('is-active', function(d, i) {
@@ -381,7 +382,17 @@ function handleStepEnter2(response) {
   // .zoom.transform,
   // zoomIdentity,
 
-  chart2.selectAll('path').attr('transform', transform);
+  chart2
+    .selectAll('path')
+    .transition()
+    .duration(600)
+    .attr('transform', transform);
+
+  // chart2
+  //   .selectAll('path')
+  //   .transition()
+  //   .duration(600)
+  //   .attr('transform', zoomIdentity);
 
   // chart2
   //   .selectAll('path')
@@ -423,7 +434,7 @@ function init2() {
 }
 
 function mapZoom() {
-  const width = 2000;
+  const width = 1000;
   const height = 500;
 
   const svg = select('#vis2')
