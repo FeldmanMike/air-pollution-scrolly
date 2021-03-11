@@ -54,7 +54,7 @@ body {
   top: auto;
 } */
 
-.scroll__graphic {
+.scroll__graphic, .scroll__graphic2 {
   position: sticky;
   right: 1rem;
   /* top: 50%; */
@@ -63,11 +63,11 @@ body {
   width: 100%;
   /* -moz-transform: translateY(-50%);
   -webkit-transform: translateY(-50%); */
-  transform: translateY(25%);
+  transform: translateY(13%);
   /* margin-top: 20%; */
 }
 
-.scroll__text {
+.scroll__text, .scroll__text2 {
   position: relative;
   padding: 0 1rem;
   max-width: 30rem;

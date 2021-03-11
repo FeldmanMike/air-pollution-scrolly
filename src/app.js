@@ -10,12 +10,13 @@
 // import {myExampleUtil} from './utils';
 import scrollama from 'scrollama';
 import {transition} from 'd3-transition';
+import {zoom, transform, zoomIdentity} from 'd3-zoom';
 // import {onStepEnter, onContainerEnter, onContainerExit} from 'scrollama';
 import {map} from 'd3-collection';
 
 // from https://github.com/jbkunst/d3-waffle/blob/master/d3-waffle.js
 import {csv, json} from 'd3-fetch';
-import {select} from 'd3-selection';
+import {select, pointer} from 'd3-selection';
 import {bin} from 'd3-array';
 import {geoPath, geoAlbersUsa} from 'd3-geo';
 import {extent} from 'd3-array';
@@ -29,11 +30,20 @@ import './main.css';
 
 // from https://pudding.cool/process/introducing-scrollama/
 var container = select('#scroll1');
+var container2 = select('#scroll2');
+
 var graphic = container.select('.scroll__graphic');
+var graphic2 = container2.select('.scroll__graphic2');
+
 var chart = graphic.select('#vis1');
 var waffChart = graphic.select('#waffle');
 var text = container.select('.scroll__text');
 var step = text.selectAll('.step');
+
+var chart2 = graphic2.select('#vis2');
+var text2 = container2.select('.scroll__text2');
+var step2 = text2.selectAll('.step');
+
 const yearOne = 2001;
 const yearLast = 2014;
 const projection = geoAlbersUsa();
@@ -50,6 +60,7 @@ const gap = 1;
 // console.log(graphic);
 
 var scroller = scrollama();
+var scroller2 = scrollama();
 
 // console.log(scroller);
 
@@ -72,7 +83,7 @@ Promise.all([
 // resize function to set dimensions on load and on page resize
 function handleResize() {
   // 1. update height of step elements for breathing room between steps
-  var stepHeight = Math.floor(window.innerHeight * 0.4);
+  var stepHeight = Math.floor(window.innerHeight * 0.5);
   step.style('height', stepHeight + 'px');
 
   // 2. update height of graphic element
@@ -95,8 +106,8 @@ function handleResize() {
 
 // scrollama event handlers
 function handleStepEnter(response) {
+  var years = [2001, 2001, 2006, 2011, 2014, 2014];
   // response = { element, direction, index }
-
   // fade in current step
   step.classed('is-active', function(d, i) {
     return i === response.index;
@@ -108,14 +119,15 @@ function handleStepEnter(response) {
   // update graphic based on step
 
   // console.log('about to update chart...');
+  // yearOne + response.index
   chart
     .selectAll('path')
     .data(window.globCounties.features)
     .transition()
-    .duration(400)
+    .duration(200)
     .attr('fill', d =>
       colorScale(
-        window.globAirData[yearOne + response.index][
+        window.globAirData[years[response.index]][
           +(d.properties.STATE + d.properties.COUNTY)
         ],
       ),
@@ -127,7 +139,7 @@ function handleStepEnter(response) {
     .data(window.numBoxes[response.index])
     .exit()
     .transition()
-    .duration(400)
+    .duration(150)
     .style('opacity', 0)
     .remove();
 
@@ -139,7 +151,7 @@ function handleStepEnter(response) {
     .append('rect')
     .merge(waffChart)
     .transition()
-    .duration(400)
+    .duration(150)
     .attr('width', squareSize)
     .attr('height', squareSize)
     .attr('fill', '#8B0000')
@@ -205,7 +217,7 @@ function fullMapVis(files) {
 
   window.globAirData = data;
   window.globCounties = counties;
-  // window.globStates = states;
+  window.globStates = states;
 
   // Map and projection
   // console.log('past path!');
@@ -257,21 +269,6 @@ function fullMapVis(files) {
     .attr('stroke-linejoin', 'round')
     .attr('d', path);
 
-  //remap data
-  function groupBy(data, accessorKey) {
-    const rv = {};
-    for (let i = 0; i < data.length; i++) {
-      arr = rv[data[i][accessorKey]];
-      // Referenced this SO post on undefined: https://stackoverflow.com/questions/4186906/check-if-object-exists-in-javascript
-      if (typeof arr != 'undefined') {
-        arr.push(data[i]);
-      } else {
-        rv[data[i][accessorKey]] = [];
-        rv[data[i][accessorKey]].push(data[i]);
-      }
-    }
-    return rv;
-  }
   function rectArray(data) {
     var boxNums = new Array();
     for (let i = yearOne; i < yearLast + 1; i++) {
@@ -327,4 +324,140 @@ function fullMapVis(files) {
       return heightSquares * squareSize - (row * squareSize + row * gap);
     });
   init();
+  mapZoom();
+}
+
+// resize function to set dimensions on load and on page resize
+function handleResize2() {
+  // 1. update height of step elements for breathing room between steps
+  var stepHeight = Math.floor(window.innerHeight * 0.5);
+  step2.style('height', stepHeight + 'px');
+
+  // 2. update height of graphic element
+  var bodyWidth = select('body').node().offsetWidth;
+
+  graphic2.style('height', window.innerHeight + 'px');
+
+  // 3. update width of chart by subtracting from text width
+  var chartMargin = 32;
+  var textWidth = text.node().offsetWidth;
+  var chartWidth = graphic.node().offsetWidth - textWidth - chartMargin;
+  // make the height 1/2 of viewport
+  var chartHeight = Math.floor(window.innerHeight / 2);
+
+  chart2.style('width', chartWidth + 'px').style('height', chartHeight + 'px');
+
+  // 4. tell scrollama to update new element dimensions
+  scroller2.resize();
+}
+
+// scrollama event handlers
+function handleStepEnter2(response) {
+  // x is leftmost point, y is topmost point
+  // { x: 31.287342071533203, y: 9.64207649230957, width: 835.5782470703125, height: 487.91693115234375 }
+  // CA: [[32, 170], [90, 400]]
+  // response = { element, direction, index }
+  // fade in current step
+  // const [[left, top], [right, bottom]]
+  // const [[x0, y0], [x1, y1]] = path.bounds(d);
+  const [[x0, y0], [x1, y1]] = [
+    [32, 170],
+    [90, 400],
+  ];
+  const width = 2000;
+  const height = 500;
+  var transform = zoomIdentity
+    .translate(width / 2, height / 2)
+    .scale(Math.min(8, 0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)))
+    .translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+
+  step2.classed('is-active', function(d, i) {
+    return i === response.index;
+  });
+
+  // chart2.call(zoom)
+  // .transition()
+  // .duration(200)
+  // .zoom.transform,
+  // zoomIdentity,
+
+  chart2.selectAll('path').attr('transform', transform);
+
+  // chart2
+  //   .selectAll('path')
+  //   .data(window.globCounties.features)
+  //   .transition()
+  //   .duration(200)
+  //   .attr('fill', d =>
+  //     colorScale(
+  //       window.globAirData[years[response.index]][
+  //         +(d.properties.STATE + d.properties.COUNTY)
+  //       ],
+  //     ),
+  //   );
+}
+
+// kick-off code to run once on load
+function init2() {
+  // 1. call a resize on load to update width/height/position of elements
+  // setupStickyfill();
+  handleResize2();
+
+  // 2. setup the scrollama instance
+  // 3. bind scrollama event handlers (this can be chained like below)
+  scroller2
+    .setup({
+      container: '#scroll2', // our outermost scrollytelling element
+      graphic: '.scroll__graphic2', // the graphic
+      text: '.scroll__text2', // the step container
+      step: '.scroll__text2 .step', // the step elements
+      offset: 0.5, // set the trigger to be 1/2 way down screen
+      debug: true, // display the trigger offset for testing
+    })
+    .onStepEnter(handleStepEnter2);
+  // .onContainerEnter(handleContainerEnter)
+  // .onContainerExit(handleContainerExit);
+
+  // setup resize event
+  window.addEventListener('resize', handleResize2);
+}
+
+function mapZoom() {
+  const width = 2000;
+  const height = 500;
+
+  const svg = select('#vis2')
+    .append('svg')
+    .attr('height', height)
+    .attr('width', width);
+
+  svg
+    .append('g')
+    .selectAll('path')
+    .data(window.globCounties.features)
+    .enter()
+    .append('path')
+    .attr('class', 'big-map')
+    .attr('fill', d =>
+      colorScale(
+        window.globAirData[2016][+(d.properties.STATE + d.properties.COUNTY)],
+      ),
+    )
+    .attr('d', path);
+
+  svg
+    .append('g')
+    .selectAll('path')
+    .data(window.globStates.features)
+    .enter()
+    .append('path')
+    .attr('class', 'big-map')
+    .attr('fill', 'none')
+    .attr('stroke', '#646464')
+    .attr('stroke-linejoin', 'round')
+    .attr('d', path);
+
+  console.log('bounding box is...');
+  console.log(svg.node().getBBox());
+  init2();
 }
