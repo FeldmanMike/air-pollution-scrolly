@@ -360,10 +360,49 @@ function handleStepEnter2(response) {
   // fade in current step
   // const [[left, top], [right, bottom]]
   // const [[x0, y0], [x1, y1]] = path.bounds(d);
-  const [[x0, y0], [x1, y1]] = [
+
+  var boundBoxes = new Array();
+  const us = [
+    [52, 40],
+    [855, 485],
+  ];
+
+  const cali = [
     [32, 140],
     [40, 325],
   ];
+
+  const midwest = [
+    [600, 125],
+    [720, 270],
+  ];
+
+  const southeast = [
+    [600, 285],
+    [720, 440],
+  ];
+
+  const hawaii = [
+    [260, 425],
+    [375, 495],
+  ];
+
+  boundBoxes.push(us);
+  boundBoxes.push(cali);
+  boundBoxes.push(midwest);
+  boundBoxes.push(southeast);
+  boundBoxes.push(hawaii);
+  boundBoxes.push(us);
+  boundBoxes.push(us);
+
+  // southeast
+  // const [[x0, y0], [x1, y1]] = [
+  //   [600, 285],
+  //   [720, 440],
+  // ];
+
+  const [[x0, y0], [x1, y1]] = boundBoxes[response.index];
+
   const width = 1000;
   const height = 500;
 
@@ -375,6 +414,9 @@ function handleStepEnter2(response) {
   step2.classed('is-active', function(d, i) {
     return i === response.index;
   });
+
+  console.log('response index 2! is...');
+  console.log(response.index);
 
   // chart2.call(zoom)
   // .transition()
