@@ -82,7 +82,7 @@ body {
 
 .step {
   margin: 0 auto 2rem auto;
-  background-color: #3b3b3b;
+  background-color: #FFFFFF;
   color: #fff;
 }
 
@@ -97,9 +97,9 @@ body {
   margin-bottom: 0;
 }
 
-.step.is-active {
+.step.is-active#text-here {
   opacity: 1;
-  background-color: goldenrod;
+  background-color: #dbdbdb;
   color: #3b3b3b;
 }
 

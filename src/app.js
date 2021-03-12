@@ -105,7 +105,9 @@ Promise.all([
 function handleResize() {
   // 1. update height of step elements for breathing room between steps
   var stepHeight = Math.floor(window.innerHeight * 0.4);
+  var stepWidth = Math.floor(window.innerWidth * 0.1);
   step.style('height', stepHeight + 'px');
+  step.style('width', stepWidth + 'px');
 
   // 2. update height of graphic element
   var bodyWidth = select('body').node().offsetWidth;
@@ -456,7 +458,9 @@ function fullMapVis(files) {
 function handleResize2() {
   // 1. update height of step elements for breathing room between steps
   var stepHeight = Math.floor(window.innerHeight * 0.5);
+  var stepWidth = Math.floor(window.innerWidth * 0.2);
   step2.style('height', stepHeight + 'px');
+  step2.style('width', stepWidth + 'px');
 
   // 2. update height of graphic element
   var bodyWidth = select('body').node().offsetWidth;
@@ -494,7 +498,7 @@ function handleStepEnter2(response) {
 
   const cali = [
     [32, 140],
-    [40, 325],
+    [250, 325],
   ];
 
   const midwest = [
@@ -635,7 +639,26 @@ function mapZoom() {
     .attr('stroke-linejoin', 'round')
     .attr('d', path);
 
-  console.log('bounding box is...');
-  console.log(svg.node().getBBox());
+  svg
+    .append('rect')
+    .attr('y', -10)
+    .attr('x', 100)
+    .attr('height', 50)
+    .attr('width', 770)
+    .attr('opacity', 0.7)
+    .attr('fill', '#dbdbdb');
+
+  svg
+    .append('text')
+    .attr('text-anchor', 'middle')
+    .attr('y', 30)
+    .attr('x', 485)
+    .text('Fine particulate (PM2.5) concentrations by county (2016)')
+    .style('font-size', '28px')
+    .attr('class', 'map-title')
+    .style('font-weight', 800);
+
+  // console.log('bounding box is...');
+  // console.log(svg.node().getBBox());
   init2();
 }
