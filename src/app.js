@@ -11,8 +11,8 @@
 import scrollama from 'scrollama';
 import {transition} from 'd3-transition';
 import {zoom, transform, zoomIdentity} from 'd3-zoom';
-// import {onStepEnter, onContainerEnter, onContainerExit} from 'scrollama';
 import {map} from 'd3-collection';
+import {format} from 'd3-format';
 
 // from https://github.com/jbkunst/d3-waffle/blob/master/d3-waffle.js
 import {csv, json} from 'd3-fetch';
@@ -48,11 +48,30 @@ const yearOne = 2001;
 const yearLast = 2014;
 const projection = geoAlbersUsa();
 const path = geoPath().projection(projection);
-const widthSquares = 10;
-const heightSquares = 14;
-const squareSize = 25;
+const widthSquares = 25;
+const heightSquares = 20;
+const squareSize = 18;
 const squareValue = 0;
 const gap = 1;
+// var years = [2001, 2001, 2006, 2011, 2014, 2014];
+var years = [
+  2001,
+  2001,
+  2002,
+  2003,
+  2004,
+  2005,
+  2006,
+  2007,
+  2008,
+  2009,
+  2010,
+  2011,
+  2012,
+  2013,
+  2014,
+  2014,
+];
 
 // var chart = d3waffle();
 
@@ -78,12 +97,14 @@ Promise.all([
   json('./data/us_air_deaths.json'),
   json('./data/cumul_air_deaths.json'),
   json('./data/waffle_boxes.json'),
+  json('./data/viz_boxes.json'),
+  json('./data/viz_deaths.json'),
 ]).then(files => fullMapVis(files));
 
 // resize function to set dimensions on load and on page resize
 function handleResize() {
   // 1. update height of step elements for breathing room between steps
-  var stepHeight = Math.floor(window.innerHeight * 0.5);
+  var stepHeight = Math.floor(window.innerHeight * 0.4);
   step.style('height', stepHeight + 'px');
 
   // 2. update height of graphic element
@@ -106,7 +127,6 @@ function handleResize() {
 
 // scrollama event handlers
 function handleStepEnter(response) {
-  var years = [2001, 2001, 2006, 2011, 2014, 2014];
   // response = { element, direction, index }
   // fade in current step
   step.classed('is-active', function(d, i) {
@@ -132,6 +152,38 @@ function handleStepEnter(response) {
         ],
       ),
     );
+
+  chart.select('.map-year').text(years[response.index]);
+
+  if (years[response.index] === yearOne) {
+    waffChart
+      .select('.waffle-title')
+      .text(
+        'If PM2.5 reduced by 25% in ' +
+          years[response.index].toString() +
+          ', an estimated',
+      );
+  } else {
+    waffChart
+      .select('.waffle-title')
+      .text(
+        'If PM2.5 reduced by 25% from ' +
+          yearOne.toString() +
+          '-' +
+          years[response.index].toString() +
+          ', an estimated',
+      );
+  }
+
+  waffChart
+    .select('.waffle-deaths')
+    .text(
+      format(',')(window.numDeaths[years[response.index]]).toString() +
+        ' deaths',
+    );
+
+  console.log('correct viz deaths is...');
+  console.log(window.numDeaths[years[response.index]]);
 
   waffChart
     .selectAll('g')
@@ -165,7 +217,8 @@ function handleStepEnter(response) {
     .attr('y', function(d, i) {
       var row = i % heightSquares;
       return heightSquares * squareSize - (row * squareSize + row * gap);
-    });
+    })
+    .attr('transform', 'translate(0, 125)');
 
   waffChart;
 
@@ -201,7 +254,7 @@ function init() {
 
 function fullMapVis(files) {
   const width = 2000;
-  const height = 500;
+  const height = 1000;
   const xDim = 'countyFIPS';
   const yDim = 'Value';
   const data = files[0];
@@ -210,6 +263,8 @@ function fullMapVis(files) {
   const deaths = files[3];
   const cumul_deaths = files[4];
   const boxes = files[5];
+  const vizBoxes = files[6];
+  const vizDeaths = files[7];
   // const years = Object.keys(boxes);
   // const numBoxes = Object.values(boxes);
   // console.log('boxes are...');
@@ -238,6 +293,7 @@ function fullMapVis(files) {
   const svg = select('#vis1')
     .append('svg')
     // .attr('viewBox', [0, 0, 975, 610]);
+    // .attr('viewBox', `0 0 ${height} ${width}`);
     .attr('height', height)
     .attr('width', width);
 
@@ -255,7 +311,8 @@ function fullMapVis(files) {
     .attr('fill', d =>
       colorScale(data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]),
     )
-    .attr('d', path);
+    .attr('d', path)
+    .attr('transform', 'translate(0, 50)');
 
   svg
     .append('g')
@@ -267,38 +324,65 @@ function fullMapVis(files) {
     .attr('fill', 'none')
     .attr('stroke', '#646464')
     .attr('stroke-linejoin', 'round')
-    .attr('d', path);
+    .attr('d', path)
+    .attr('transform', 'translate(0, 50)');
+
+  // Title and subtitle
+  svg
+    .append('text')
+    .attr('text-anchor', 'middle')
+    .attr('y', 20)
+    .attr('x', 450)
+    .text('Fine particulate (PM2.5) concentrations by county in...')
+    .style('font-size', '20px')
+    .attr('class', 'map-title');
+  // .style('font-weight', 800);
+
+  svg
+    .append('text')
+    .attr('text-anchor', 'middle')
+    .attr('y', 50)
+    .attr('x', 450)
+    .text(yearOne)
+    .style('font-size', '28px')
+    .style('font-weight', 800)
+    .attr('class', 'map-year');
 
   function rectArray(data) {
     var boxNums = new Array();
-    for (let i = yearOne; i < yearLast + 1; i++) {
-      console.log('data value is...');
-      console.log(data[i]);
+    for (let i = 0; i < 16; i++) {
       boxNums.push(
-        Array(data[i] + 1)
+        Array(data[years[i]] + 1)
           .join(1)
           .split('')
           .map(function() {
-            return {units: data[i], groupIndex: i};
+            return {units: data[years[i]], groupIndex: i};
           }),
       );
     }
     return boxNums;
   }
 
+  // console.log('viz boxes is...');
+  // console.log(vizBoxes);
+  // var boxData = rectArray(vizBoxes);
   var boxData = rectArray(boxes);
+  console.log('box data is...');
+  console.log(boxData);
   window.numBoxes = boxData;
+  // window.numDeaths = vizDeaths;
+  window.numDeaths = cumul_deaths;
   console.log('box data is...');
   console.log(boxData);
 
   const width_waf = squareSize * widthSquares + widthSquares * gap + 200;
-  const height_waf = squareSize * heightSquares + heightSquares * gap + 75;
+  const height_waf = squareSize * heightSquares + heightSquares * gap + 175;
 
   var waffle = select('#waffle')
     .append('svg')
     .attr('width', width_waf)
     .attr('height', height_waf)
-    .attr('transform', 'translate(1000, -270)');
+    .attr('transform', 'translate(1000, -350)');
 
   console.log('boxes are...');
   console.log(boxes);
@@ -322,7 +406,48 @@ function fullMapVis(files) {
     .attr('y', function(d, i) {
       var row = i % heightSquares;
       return heightSquares * squareSize - (row * squareSize + row * gap);
-    });
+    })
+    .attr('transform', 'translate(0, 125)');
+
+  waffle
+    .selectAll('g')
+    .append('text')
+    .attr('text-anchor', 'middle')
+    .attr('y', 25)
+    .attr('x', 250)
+    .text('If PM2.5 reduced by 25% in ' + yearOne.toString() + ', an estimated')
+    .style('font-size', '20px')
+    .attr('class', 'waffle-title');
+
+  waffle
+    .selectAll('g')
+    .append('text')
+    .attr('text-anchor', 'middle')
+    .attr('y', 55)
+    .attr('x', 250)
+    .text(format(',')(vizDeaths[yearOne]).toString() + ' deaths')
+    .style('font-size', '28px')
+    .attr('class', 'waffle-deaths')
+    .style('font-weight', 800);
+
+  waffle
+    .selectAll('g')
+    .append('text')
+    .attr('text-anchor', 'middle')
+    .attr('y', 80)
+    .attr('x', 250)
+    .text('could have been avoided')
+    .style('font-size', '20px');
+
+  waffle
+    .selectAll('g')
+    .append('text')
+    .attr('text-anchor', 'middle')
+    .attr('y', 100)
+    .attr('x', 250)
+    .text('(each box below represents 1,000 deaths)')
+    .style('font-size', '13px');
+
   init();
   mapZoom();
 }

@@ -64,8 +64,15 @@ body {
   /* -moz-transform: translateY(-50%);
   -webkit-transform: translateY(-50%); */
   transform: translateY(13%);
+  align-items: center;
   /* margin-top: 20%; */
 }
+
+
+/* #waffle {
+  display: block;
+  margin: auto;
+} */
 
 .scroll__text, .scroll__text2 {
   position: relative;
