@@ -158,11 +158,15 @@ function handleStepEnter(response) {
     .transition()
     .duration(200)
     .attr('fill', d =>
-      colorScale(
-        window.globAirData[years[response.index]][
-          +(d.properties.STATE + d.properties.COUNTY)
-        ],
-      ),
+      window.globAirData[years[response.index]][
+        +(d.properties.STATE + d.properties.COUNTY)
+      ] < 0
+        ? 'grey'
+        : colorScale(
+            window.globAirData[years[response.index]][
+              +(d.properties.STATE + d.properties.COUNTY)
+            ],
+          ),
     );
 
   chart.select('.map-year').text(years[response.index]);
@@ -179,10 +183,10 @@ function handleStepEnter(response) {
     waffChart
       .select('.waffle-title')
       .text(
-        'If PM2.5 reduced by 25% from ' +
-          yearOne.toString() +
-          '-' +
-          years[response.index].toString() +
+        "If PM2.5 reduced by 25% from '" +
+          yearOne.toString().substr(2, 2) +
+          "-'" +
+          years[response.index].toString().substr(2, 2) +
           ', an estimated',
       );
   }
@@ -194,8 +198,8 @@ function handleStepEnter(response) {
         ' deaths',
     );
 
-  console.log('correct viz deaths is...');
-  console.log(window.numDeaths[years[response.index]]);
+  // console.log('correct viz deaths is...');
+  // console.log(window.numDeaths[years[response.index]]);
 
   waffChart
     .selectAll('g')
@@ -312,19 +316,33 @@ function fullMapVis(files) {
     .attr('width', width)
     .attr('transform', 'translate(180, 0)');
 
-  console.log('here I am!');
+  // console.log('here I am!');
 
   //Bind data and create one path per GeoJSON feature
   // used https://observablehq.com/@d3/choropleth
+  // svg
+  //   .append('g')
+  //   .selectAll('path')
+  //   // .data(counties.features)
+  //   .enter()
+  //   .append('path')
+  //   .attr('fill', 'grey')
+  //   .attr('d', path)
+  //   .attr('transform', 'translate(-80, 50) scale(0.9)');
+
   svg
     .append('g')
     .selectAll('path')
     .data(counties.features)
     .enter()
     .append('path')
-    .attr('class', 'big-map')
+    .attr('class', 'counties')
     .attr('fill', d =>
-      colorScale(data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]),
+      d < 0
+        ? 'grey'
+        : colorScale(
+            data[yearOne][+(d.properties.STATE + d.properties.COUNTY)],
+          ),
     )
     .attr('d', path)
     .attr('transform', 'translate(-80, 50) scale(0.9)');
@@ -335,7 +353,6 @@ function fullMapVis(files) {
     .data(states.features)
     .enter()
     .append('path')
-    .attr('class', 'big-map')
     .attr('fill', 'none')
     .attr('class', 'states')
     .attr('stroke', '#646464')
@@ -397,13 +414,13 @@ function fullMapVis(files) {
   // console.log(vizBoxes);
   // var boxData = rectArray(vizBoxes);
   var boxData = rectArray(boxes);
-  console.log('box data is...');
-  console.log(boxData);
+  // console.log('box data is...');
+  // console.log(boxData);
   window.numBoxes = boxData;
   // window.numDeaths = vizDeaths;
   window.numDeaths = cumul_deaths;
-  console.log('box data is...');
-  console.log(boxData);
+  // console.log('box data is...');
+  // console.log(boxData);
 
   const width_waf = squareSize * widthSquares + widthSquares * gap + 200;
   const height_waf = squareSize * heightSquares + heightSquares * gap + 175;
@@ -570,8 +587,8 @@ function handleStepEnter2(response) {
     return i === response.index;
   });
 
-  console.log('response index 2! is...');
-  console.log(response.index);
+  // console.log('response index 2! is...');
+  // console.log(response.index);
 
   // chart2.call(zoom)
   // .transition()
@@ -582,7 +599,7 @@ function handleStepEnter2(response) {
   chart2
     .selectAll('path')
     .transition()
-    .duration(600)
+    .duration(800)
     .attr('transform', transform);
 
   // chart2

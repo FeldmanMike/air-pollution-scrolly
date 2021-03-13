@@ -103,9 +103,9 @@ body {
   color: #3b3b3b;
 }
 
-.states {
+/* .counties {
   fill: none
-}
+} */
 
 .graph-container {
   display: flex;
@@ -134,7 +134,8 @@ body {
 }
 
 #waffle {
-  margin-left: auto
+  margin-left: auto;
+  max-width: 900px;
 }
 
 
