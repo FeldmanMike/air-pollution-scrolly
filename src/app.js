@@ -161,7 +161,7 @@ function handleStepEnter(response) {
       window.globAirData[years[response.index]][
         +(d.properties.STATE + d.properties.COUNTY)
       ] < 0
-        ? 'grey'
+        ? '#d3d3d3'
         : colorScale(
             window.globAirData[years[response.index]][
               +(d.properties.STATE + d.properties.COUNTY)
@@ -174,16 +174,12 @@ function handleStepEnter(response) {
   if (years[response.index] === yearOne) {
     waffChart
       .select('.waffle-title')
-      .text(
-        'If PM2.5 reduced by 25% in ' +
-          years[response.index].toString() +
-          ', an estimated',
-      );
+      .text('in ' + years[response.index].toString() + ', an estimated');
   } else {
     waffChart
       .select('.waffle-title')
       .text(
-        "If PM2.5 reduced by 25% from '" +
+        "each year from '" +
           yearOne.toString().substr(2, 2) +
           "-'" +
           years[response.index].toString().substr(2, 2) +
@@ -339,7 +335,7 @@ function fullMapVis(files) {
     .attr('class', 'counties')
     .attr('fill', d =>
       d < 0
-        ? 'grey'
+        ? '#d3d3d3'
         : colorScale(
             data[yearOne][+(d.properties.STATE + d.properties.COUNTY)],
           ),
@@ -460,7 +456,16 @@ function fullMapVis(files) {
     .attr('text-anchor', 'middle')
     .attr('y', 15)
     .attr('x', 230)
-    .text('If PM2.5 reduced by 25% in ' + yearOne.toString() + ', an estimated')
+    .text('If PM2.5 concentrations reduced by 25%')
+    .style('font-size', '20px');
+
+  waffle
+    .selectAll('g')
+    .append('text')
+    .attr('text-anchor', 'middle')
+    .attr('y', 40)
+    .attr('x', 230)
+    .text('in ' + yearOne.toString() + ', an estimated')
     .style('font-size', '20px')
     .attr('class', 'waffle-title');
 
@@ -468,7 +473,7 @@ function fullMapVis(files) {
     .selectAll('g')
     .append('text')
     .attr('text-anchor', 'middle')
-    .attr('y', 45)
+    .attr('y', 70)
     .attr('x', 230)
     .text(format(',')(vizDeaths[yearOne]).toString() + ' deaths')
     .style('font-size', '28px')
@@ -479,7 +484,7 @@ function fullMapVis(files) {
     .selectAll('g')
     .append('text')
     .attr('text-anchor', 'middle')
-    .attr('y', 70)
+    .attr('y', 95)
     .attr('x', 230)
     .text('could have been avoided')
     .style('font-size', '20px');
@@ -488,7 +493,7 @@ function fullMapVis(files) {
     .selectAll('g')
     .append('text')
     .attr('text-anchor', 'middle')
-    .attr('y', 90)
+    .attr('y', 115)
     .attr('x', 230)
     .text('(each box below represents 1,000 deaths)')
     .style('font-size', '13px');
@@ -665,9 +670,13 @@ function mapZoom() {
     .append('path')
     .attr('class', 'big-map')
     .attr('fill', d =>
-      colorScale(
-        window.globAirData[2016][+(d.properties.STATE + d.properties.COUNTY)],
-      ),
+      d < 0
+        ? '#d3d3d3'
+        : colorScale(
+            window.globAirData[2016][
+              +(d.properties.STATE + d.properties.COUNTY)
+            ],
+          ),
     )
     .attr('d', path);
 
