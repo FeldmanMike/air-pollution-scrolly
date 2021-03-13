@@ -106,6 +106,7 @@ Promise.all([
   json('./data/waffle_boxes.json'),
   json('./data/viz_boxes.json'),
   json('./data/viz_deaths.json'),
+  json('./data/state_mapping.json'),
 ]).then(files => fullMapVis(files));
 
 // resize function to set dimensions on load and on page resize
@@ -167,6 +168,18 @@ function handleStepEnter(response) {
               +(d.properties.STATE + d.properties.COUNTY)
             ],
           ),
+    )
+    .select('title')
+    //     .append('title')
+    .text(
+      d => `${d.properties.NAME} County, ${
+        window.globStateMap[d.properties.STATE]
+      }
+${
+  window.globAirData[years[response.index]][
+    +(d.properties.STATE + d.properties.COUNTY)
+  ]
+}`,
     );
 
   chart.select('.map-year').text(years[response.index]);
@@ -277,6 +290,7 @@ function fullMapVis(files) {
   const boxes = files[5];
   const vizBoxes = files[6];
   const vizDeaths = files[7];
+  const stateMap = files[8];
   // const years = Object.keys(boxes);
   // const numBoxes = Object.values(boxes);
   // console.log('boxes are...');
@@ -285,6 +299,7 @@ function fullMapVis(files) {
   window.globAirData = data;
   window.globCounties = counties;
   window.globStates = states;
+  window.globStateMap = stateMap;
 
   // Map and projection
   // console.log('past path!');
@@ -341,7 +356,22 @@ function fullMapVis(files) {
           ),
     )
     .attr('d', path)
-    .attr('transform', 'translate(-80, 50) scale(0.9)');
+    .attr('transform', 'translate(-80, 50) scale(0.9)')
+    .append('title')
+    .text(
+      d => `${d.properties.NAME} County, ${
+        window.globStateMap[d.properties.STATE]
+      }
+${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
+    );
+
+  console.log('counties are...');
+  console.log(counties);
+
+  console.log('states are...');
+  console.log(states);
+
+  // counties.features.properties.NAME
 
   svg
     .append('g')
@@ -670,7 +700,7 @@ function mapZoom() {
     .append('path')
     .attr('class', 'big-map')
     .attr('fill', d =>
-      d < 0
+      window.globAirData[2016][+(d.properties.STATE + d.properties.COUNTY)] < 0
         ? '#d3d3d3'
         : colorScale(
             window.globAirData[2016][
@@ -678,7 +708,14 @@ function mapZoom() {
             ],
           ),
     )
-    .attr('d', path);
+    .attr('d', path)
+    .append('title')
+    .text(
+      d => `${d.properties.NAME} County, ${
+        window.globStateMap[d.properties.STATE]
+      }
+${window.globAirData[2016][+(d.properties.STATE + d.properties.COUNTY)]}`,
+    );
 
   svg
     .append('g')
