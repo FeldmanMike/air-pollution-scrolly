@@ -70,8 +70,8 @@ body {
 
 
 /* #waffle {
-  display: block;
-  margin: auto;
+  position: relative;
+  max-width: 30rem;
 } */
 
 .scroll__text, .scroll__text2 {
@@ -101,6 +101,40 @@ body {
   opacity: 1;
   background-color: #dbdbdb;
   color: #3b3b3b;
+}
+
+.states {
+  fill: none
+}
+
+.graph-container {
+  display: flex;
+  flex-flow: row;
+  min-height: 80vh;
+  align-items: flex-start;
+  align-content: flex-start;
+  justify-content: flex-start;
+  /* display: flex;
+  flex-flow: column;
+  justify-content: flex-start;
+  align-content: flex-start;
+  margin-right: auto;
+  margin-bottom: auto; */
+  /* max-width:50%;
+  min-width:800px;
+  max-height:100px;
+  min-height:21%; */
+  /* min-height: 100px */
+}
+
+#vis1 {
+  margin-left: auto;
+  min-width: 950px;
+  max-width: 1000px;
+}
+
+#waffle {
+  margin-left: auto
 }
 
 

@@ -13,6 +13,7 @@ import {transition} from 'd3-transition';
 import {zoom, transform, zoomIdentity} from 'd3-zoom';
 import {map} from 'd3-collection';
 import {format} from 'd3-format';
+import {legendColor} from 'd3-svg-legend';
 
 // from https://github.com/jbkunst/d3-waffle/blob/master/d3-waffle.js
 import {csv, json} from 'd3-fetch';
@@ -50,7 +51,7 @@ const projection = geoAlbersUsa();
 const path = geoPath().projection(projection);
 const widthSquares = 25;
 const heightSquares = 20;
-const squareSize = 18;
+const squareSize = 16;
 const squareValue = 0;
 const gap = 1;
 // var years = [2001, 2001, 2006, 2011, 2014, 2014];
@@ -90,6 +91,12 @@ const colorScale = scaleThreshold()
   // .range(interpolateViridis[5]);
   .range(schemeYlGnBu[5]);
 
+var colorLegend = legendColor()
+  .scale(colorScale)
+  .labels(['0 - 3', '3 - 6', '6 - 9', '9 - 12', '12+'])
+  .title('Concentration (micrograms per cubic meter)')
+  .titleWidth(150);
+
 Promise.all([
   json('./data/us_air_pollution.json'),
   json('./data/us-counties.json'),
@@ -122,6 +129,9 @@ function handleResize() {
   var chartHeight = Math.floor(window.innerHeight / 2);
 
   chart.style('width', chartWidth + 'px').style('height', chartHeight + 'px');
+  // waffChart
+  //   .style('width', chartWidth + 'px')
+  //   .style('height', chartHeight + 'px');
 
   // 4. tell scrollama to update new element dimensions
   scroller.resize();
@@ -242,7 +252,7 @@ function init() {
       text: '.scroll__text', // the step container
       step: '.scroll__text .step', // the step elements
       offset: 0.5, // set the trigger to be 1/2 way down screen
-      debug: true, // display the trigger offset for testing
+      debug: false, // display the trigger offset for testing
     })
     .onStepEnter(handleStepEnter);
   // .onContainerEnter(handleContainerEnter)
@@ -255,8 +265,8 @@ function init() {
 // function updateMap() {}
 
 function fullMapVis(files) {
-  const width = 2000;
-  const height = 1000;
+  const width = 920;
+  const height = 800;
   const xDim = 'countyFIPS';
   const yDim = 'Value';
   const data = files[0];
@@ -291,13 +301,16 @@ function fullMapVis(files) {
   //     counties.features[0].properties.COUNTY,
   // );
 
+  // .orient('horizontal');
+
   // Create svg
   const svg = select('#vis1')
     .append('svg')
     // .attr('viewBox', [0, 0, 975, 610]);
     // .attr('viewBox', `0 0 ${height} ${width}`);
     .attr('height', height)
-    .attr('width', width);
+    .attr('width', width)
+    .attr('transform', 'translate(180, 0)');
 
   console.log('here I am!');
 
@@ -314,7 +327,7 @@ function fullMapVis(files) {
       colorScale(data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]),
     )
     .attr('d', path)
-    .attr('transform', 'translate(0, 50)');
+    .attr('transform', 'translate(-80, 50) scale(0.9)');
 
   svg
     .append('g')
@@ -324,17 +337,18 @@ function fullMapVis(files) {
     .append('path')
     .attr('class', 'big-map')
     .attr('fill', 'none')
+    .attr('class', 'states')
     .attr('stroke', '#646464')
     .attr('stroke-linejoin', 'round')
     .attr('d', path)
-    .attr('transform', 'translate(0, 50)');
+    .attr('transform', 'translate(-80, 50) scale(0.9)');
 
   // Title and subtitle
   svg
     .append('text')
     .attr('text-anchor', 'middle')
     .attr('y', 20)
-    .attr('x', 450)
+    .attr('x', 380)
     .text('Fine particulate (PM2.5) concentrations by county in...')
     .style('font-size', '20px')
     .attr('class', 'map-title');
@@ -344,11 +358,25 @@ function fullMapVis(files) {
     .append('text')
     .attr('text-anchor', 'middle')
     .attr('y', 50)
-    .attr('x', 450)
+    .attr('x', 380)
     .text(yearOne)
     .style('font-size', '28px')
     .style('font-weight', 800)
     .attr('class', 'map-year');
+
+  svg
+    .append('text')
+    .attr('text-anchor', 'start')
+    .attr('y', 570)
+    .attr('x', 0)
+    .text('Source: Center for Disease Control and Prevention')
+    .style('font-size', '14px')
+    .style('fill', '#808080');
+
+  svg
+    .append('g')
+    .call(colorLegend)
+    .attr('transform', 'translate(630, 370)');
 
   function rectArray(data) {
     var boxNums = new Array();
@@ -383,11 +411,9 @@ function fullMapVis(files) {
   var waffle = select('#waffle')
     .append('svg')
     .attr('width', width_waf)
-    .attr('height', height_waf)
-    .attr('transform', 'translate(1000, -350)');
-
-  console.log('boxes are...');
-  console.log(boxes);
+    .attr('height', height_waf);
+  // .attr('transform', 'translate(0, 35)');
+  // .attr('transform', 'translate(1000, -350)');
 
   waffle
     .append('g')
@@ -415,8 +441,8 @@ function fullMapVis(files) {
     .selectAll('g')
     .append('text')
     .attr('text-anchor', 'middle')
-    .attr('y', 25)
-    .attr('x', 250)
+    .attr('y', 15)
+    .attr('x', 230)
     .text('If PM2.5 reduced by 25% in ' + yearOne.toString() + ', an estimated')
     .style('font-size', '20px')
     .attr('class', 'waffle-title');
@@ -425,8 +451,8 @@ function fullMapVis(files) {
     .selectAll('g')
     .append('text')
     .attr('text-anchor', 'middle')
-    .attr('y', 55)
-    .attr('x', 250)
+    .attr('y', 45)
+    .attr('x', 230)
     .text(format(',')(vizDeaths[yearOne]).toString() + ' deaths')
     .style('font-size', '28px')
     .attr('class', 'waffle-deaths')
@@ -436,8 +462,8 @@ function fullMapVis(files) {
     .selectAll('g')
     .append('text')
     .attr('text-anchor', 'middle')
-    .attr('y', 80)
-    .attr('x', 250)
+    .attr('y', 70)
+    .attr('x', 230)
     .text('could have been avoided')
     .style('font-size', '20px');
 
@@ -445,8 +471,8 @@ function fullMapVis(files) {
     .selectAll('g')
     .append('text')
     .attr('text-anchor', 'middle')
-    .attr('y', 100)
-    .attr('x', 250)
+    .attr('y', 90)
+    .attr('x', 230)
     .text('(each box below represents 1,000 deaths)')
     .style('font-size', '13px');
 
@@ -458,7 +484,7 @@ function fullMapVis(files) {
 function handleResize2() {
   // 1. update height of step elements for breathing room between steps
   var stepHeight = Math.floor(window.innerHeight * 0.5);
-  var stepWidth = Math.floor(window.innerWidth * 0.2);
+  var stepWidth = Math.floor(window.innerWidth * 0.15);
   step2.style('height', stepHeight + 'px');
   step2.style('width', stepWidth + 'px');
 
@@ -594,7 +620,7 @@ function init2() {
       text: '.scroll__text2', // the step container
       step: '.scroll__text2 .step', // the step elements
       offset: 0.5, // set the trigger to be 1/2 way down screen
-      debug: true, // display the trigger offset for testing
+      debug: false, // display the trigger offset for testing
     })
     .onStepEnter(handleStepEnter2);
   // .onContainerEnter(handleContainerEnter)
@@ -611,7 +637,8 @@ function mapZoom() {
   const svg = select('#vis2')
     .append('svg')
     .attr('height', height)
-    .attr('width', width);
+    .attr('width', width)
+    .attr('transform', 'translate(60, 0)');
 
   svg
     .append('g')
@@ -641,10 +668,19 @@ function mapZoom() {
 
   svg
     .append('rect')
+    .attr('y', 0)
+    .attr('x', 0)
+    .attr('height', 175)
+    .attr('width', 130)
+    .attr('opacity', 0.55)
+    .attr('fill', '#dbdbdb');
+
+  svg
+    .append('rect')
     .attr('y', -10)
-    .attr('x', 100)
+    .attr('x', 140)
     .attr('height', 50)
-    .attr('width', 770)
+    .attr('width', 690)
     .attr('opacity', 0.7)
     .attr('fill', '#dbdbdb');
 
@@ -653,10 +689,24 @@ function mapZoom() {
     .attr('text-anchor', 'middle')
     .attr('y', 30)
     .attr('x', 485)
-    .text('Fine particulate (PM2.5) concentrations by county (2016)')
-    .style('font-size', '28px')
+    .text('A brief tour: PM2.5 concentrations across the US (2016)')
+    .style('font-size', '26px')
     .attr('class', 'map-title')
     .style('font-weight', 800);
+
+  svg
+    .append('g')
+    .call(colorLegend)
+    .attr('transform', 'translate(7, 20)');
+
+  // svg
+  //   .append('text')
+  //   .attr('text-anchor', 'start')
+  //   .attr('y', 500)
+  //   .attr('x', 50)
+  //   .text('Source: Center for Disease Control and Prevention')
+  //   .style('font-size', '14px')
+  //   .style('fill', '#808080');
 
   // console.log('bounding box is...');
   // console.log(svg.node().getBBox());
