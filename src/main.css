@@ -25,6 +25,11 @@ body {
   line-height: 31px;
 }
 
+.after-text {
+  font-size: 16px;
+  font-style: italic;
+}
+
 
 /* taken from: https://pudding.cool/process/introducing-scrollama/ */
 #scroll1, #scroll2 {
@@ -87,9 +92,9 @@ body {
 }
 
 .step p {
-  text-align: center;
   padding: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
+  text-align: left;
 }
 
 
@@ -100,7 +105,7 @@ body {
 .step.is-active#text-here {
   opacity: 1;
   background-color: #dbdbdb;
-  color: #3b3b3b;
+  color: #3b3b3b
 }
 
 /* .counties {
@@ -146,7 +151,8 @@ body {
   width: 600px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 5%;
+  margin-top: 2%;
+  margin-bottom: 2%;
 }
 
 /* From https://codepen.io/will-r-chase/pen/arGoxw */

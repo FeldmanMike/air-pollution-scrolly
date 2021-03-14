@@ -349,7 +349,7 @@ function fullMapVis(files) {
     .append('path')
     .attr('class', 'counties')
     .attr('fill', d =>
-      d < 0
+      data[yearOne][+(d.properties.STATE + d.properties.COUNTY)] < 0
         ? '#d3d3d3'
         : colorScale(
             data[yearOne][+(d.properties.STATE + d.properties.COUNTY)],
@@ -365,11 +365,11 @@ function fullMapVis(files) {
 ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
     );
 
-  console.log('counties are...');
-  console.log(counties);
-
-  console.log('states are...');
-  console.log(states);
+  // console.log('counties are...');
+  // console.log(counties);
+  //
+  // console.log('states are...');
+  // console.log(states);
 
   // counties.features.properties.NAME
 
@@ -535,8 +535,8 @@ ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
 // resize function to set dimensions on load and on page resize
 function handleResize2() {
   // 1. update height of step elements for breathing room between steps
-  var stepHeight = Math.floor(window.innerHeight * 0.5);
-  var stepWidth = Math.floor(window.innerWidth * 0.15);
+  var stepHeight = Math.floor(window.innerHeight * 0.8);
+  var stepWidth = Math.floor(window.innerWidth * 0.16);
   step2.style('height', stepHeight + 'px');
   step2.style('width', stepWidth + 'px');
 
@@ -599,7 +599,7 @@ function handleStepEnter2(response) {
   boundBoxes.push(midwest);
   boundBoxes.push(southeast);
   boundBoxes.push(hawaii);
-  boundBoxes.push(us);
+  // boundBoxes.push(us);
   boundBoxes.push(us);
 
   // southeast
@@ -732,7 +732,7 @@ ${window.globAirData[2016][+(d.properties.STATE + d.properties.COUNTY)]}`,
   svg
     .append('rect')
     .attr('y', 0)
-    .attr('x', 0)
+    .attr('x', 8)
     .attr('height', 175)
     .attr('width', 130)
     .attr('opacity', 0.55)
@@ -760,7 +760,7 @@ ${window.globAirData[2016][+(d.properties.STATE + d.properties.COUNTY)]}`,
   svg
     .append('g')
     .call(colorLegend)
-    .attr('transform', 'translate(7, 20)');
+    .attr('transform', 'translate(15, 20)');
 
   // svg
   //   .append('text')
