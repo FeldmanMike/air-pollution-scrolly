@@ -56,6 +56,10 @@ body {
   color: #fff;
 }
 
+.step a {
+  color: #ffffff
+}
+
 .step p {
   padding: 1rem;
   font-size: 1.1rem;
@@ -71,6 +75,14 @@ body {
   opacity: 1;
   background-color: #dbdbdb;
   color: #3b3b3b
+}
+
+.step.is-active a {
+  color: blue;
+}
+
+.step.is-active a:visited {
+  color: purple;
 }
 
 .graph-container {
