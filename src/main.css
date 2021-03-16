@@ -5,7 +5,6 @@ a {
 
 html,
 body {
-  /* background: #D6D6CE; */
   font-family: Helvetica, sans-serif;
   height: 100%;
   margin: 0;
@@ -30,54 +29,20 @@ body {
   font-style: italic;
 }
 
-
 /* taken from: https://pudding.cool/process/introducing-scrollama/ */
 #scroll1, #scroll2 {
-  /* height: 100%; */
-  /* height: 2000px; */
   position: relative;
   display: flex;
 }
 
-/* .scroll__graphic {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: auto;
-  width: 100%;
-  /* -webkit-transform: translate3d(0, 0, 0);
-  -moz-transform: translate3d(0, 0, 0); */
-  /* transform: translate3d(0, 0, 0); */
-
-
-/* .scroll__graphic.is-fixed {
-  position: fixed;
-}
-
-.scroll__graphic.is-bottom {
-  bottom: 0;
-  top: auto;
-} */
-
 .scroll__graphic, .scroll__graphic2 {
   position: sticky;
   right: 1rem;
-  /* top: 50%; */
   top: 0;
-  /* position: -webkit-sticky; */
   width: 100%;
-  /* -moz-transform: translateY(-50%);
-  -webkit-transform: translateY(-50%); */
   transform: translateY(13%);
   align-items: center;
-  /* margin-top: 20%; */
 }
-
-
-/* #waffle {
-  position: relative;
-  max-width: 30rem;
-} */
 
 .scroll__text, .scroll__text2 {
   position: relative;
@@ -108,10 +73,6 @@ body {
   color: #3b3b3b
 }
 
-/* .counties {
-  fill: none
-} */
-
 .graph-container {
   display: flex;
   flex-flow: row;
@@ -119,17 +80,6 @@ body {
   align-items: flex-start;
   align-content: flex-start;
   justify-content: flex-start;
-  /* display: flex;
-  flex-flow: column;
-  justify-content: flex-start;
-  align-content: flex-start;
-  margin-right: auto;
-  margin-bottom: auto; */
-  /* max-width:50%;
-  min-width:800px;
-  max-height:100px;
-  min-height:21%; */
-  /* min-height: 100px */
 }
 
 #vis1 {
@@ -143,7 +93,6 @@ body {
   max-width: 900px;
 }
 
-
 #page-container {
   display: flex;
   flex-flow: column;
@@ -154,31 +103,6 @@ body {
   margin-top: 2%;
   margin-bottom: 2%;
 }
-
-/* From https://codepen.io/will-r-chase/pen/arGoxw */
-/* .waffle-container {
-  display: flex;
-  flex-wrap: wrap-reverse;
-  margin: 10px;
-  width: 200px;
-  height: 500px;
-  justify-content: flex-start;
-  align-content: flex-start;
-}
-
-#waffle-box {
-  width: 10px;
-  height: 10px;
-  margin: 2px;
-  z-index: 0;
-  background-color: #FF7373;
-  position: relative;
-  -moz-border-radius: 1px;
-  -webkit-border-radius: 1px;
-  border-radius: 1px;
-  transform: scale(0);
-} */
-
 
 #header {
     background-color: #ececec;
@@ -191,7 +115,6 @@ body {
   display: flex;
   flex-flow: column;
   margin-bottom: 2%;
-  /* justify-content: center; */
 }
 
 #title-text-container {
@@ -206,13 +129,11 @@ body {
   line-height: 50px;
   font-weight: bold;
   font-style: italic;
-  /* text-align: center; */
 }
 
 #subtitle-text,
 #author-text {
   font-family: sans-serif;
-  /* text-align: left; */
 }
 
 #subtitle-text {

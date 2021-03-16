@@ -1,13 +1,3 @@
-// TODO - wrangle pollution data so it's in JSON form:
-// keys are years, values are key/value pairs with countyFIPS & pollution value
-// (then I can do a global import)
-
-// then try and get scrolling + filtering to work (it should)
-
-// if the data you are going to import is small, then you can import it using es6 import
-// (I like to use use screaming snake case for imported json)
-
-// import {myExampleUtil} from './utils';
 import scrollama from 'scrollama';
 import {transition} from 'd3-transition';
 import {zoom, transform, zoomIdentity} from 'd3-zoom';
@@ -29,6 +19,7 @@ import {
 } from 'd3-scale-chromatic';
 import './main.css';
 
+// Define containers to be used for scrolly graphics
 // from https://pudding.cool/process/introducing-scrollama/
 var container = select('#scroll1');
 var container2 = select('#scroll2');
@@ -45,6 +36,10 @@ var chart2 = graphic2.select('#vis2');
 var text2 = container2.select('.scroll__text2');
 var step2 = text2.selectAll('.step');
 
+var scroller = scrollama();
+var scroller2 = scrollama();
+
+// Define constants used in generation of maps and waffle plot
 const yearOne = 2001;
 const yearLast = 2014;
 const projection = geoAlbersUsa();
@@ -54,7 +49,8 @@ const heightSquares = 20;
 const squareSize = 16;
 const squareValue = 0;
 const gap = 1;
-// var years = [2001, 2001, 2006, 2011, 2014, 2014];
+
+// Years looped through in first scrolly map
 var years = [
   2001,
   2001,
@@ -74,23 +70,13 @@ var years = [
   2014,
 ];
 
-// var chart = d3waffle();
-
-// console.log('graphic is...');
-// console.log(graphic);
-
-var scroller = scrollama();
-var scroller2 = scrollama();
-
-// console.log(scroller);
-
 // Data and color scale
 const thresholds = [3, 6, 9, 12];
 const colorScale = scaleThreshold()
   .domain(thresholds)
-  // .range(interpolateViridis[5]);
   .range(schemeYlGnBu[5]);
 
+// Legend
 var colorLegend = legendColor()
   .scale(colorScale)
   .labels(['0 - 3', '3 - 6', '6 - 9', '9 - 12', '12+'])
@@ -126,13 +112,11 @@ function handleResize() {
   var chartMargin = 32;
   var textWidth = text.node().offsetWidth;
   var chartWidth = graphic.node().offsetWidth - textWidth - chartMargin;
+
   // make the height 1/2 of viewport
   var chartHeight = Math.floor(window.innerHeight / 2);
 
   chart.style('width', chartWidth + 'px').style('height', chartHeight + 'px');
-  // waffChart
-  //   .style('width', chartWidth + 'px')
-  //   .style('height', chartHeight + 'px');
 
   // 4. tell scrollama to update new element dimensions
   scroller.resize();
@@ -140,19 +124,12 @@ function handleResize() {
 
 // scrollama event handlers
 function handleStepEnter(response) {
-  // response = { element, direction, index }
   // fade in current step
   step.classed('is-active', function(d, i) {
     return i === response.index;
   });
-  // console.log('response index is...');
-  // console.log(response.index);
-  //
-  // console.log(response.index + yearOne);
-  // update graphic based on step
 
-  // console.log('about to update chart...');
-  // yearOne + response.index
+  // update map fill and title based on year of current step
   chart
     .selectAll('path')
     .data(window.globCounties.features)
@@ -170,7 +147,6 @@ function handleStepEnter(response) {
           ),
     )
     .select('title')
-    //     .append('title')
     .text(
       d => `${d.properties.NAME} County, ${
         window.globStateMap[d.properties.STATE]
@@ -184,6 +160,7 @@ ${
 
   chart.select('.map-year').text(years[response.index]);
 
+  // update waffle chart and title based on year of current step
   if (years[response.index] === yearOne) {
     waffChart
       .select('.waffle-title')
@@ -206,9 +183,6 @@ ${
       format(',')(window.numDeaths[years[response.index]]).toString() +
         ' deaths',
     );
-
-  // console.log('correct viz deaths is...');
-  // console.log(window.numDeaths[years[response.index]]);
 
   waffChart
     .selectAll('g')
@@ -235,8 +209,6 @@ ${
     .attr('x', function(d, i) {
       //group n squares for column
       var col = Math.floor(i / heightSquares);
-      // console.log('i is...');
-      // console.log(i);
       return col * squareSize + col * gap;
     })
     .attr('y', function(d, i) {
@@ -246,18 +218,15 @@ ${
     .attr('transform', 'translate(0, 125)');
 
   waffChart;
-
-  // console.log('chart updated!');
 }
 
 // kick-off code to run once on load
 function init() {
   // 1. call a resize on load to update width/height/position of elements
-  // setupStickyfill();
   handleResize();
 
   // 2. setup the scrollama instance
-  // 3. bind scrollama event handlers (this can be chained like below)
+  // 3. bind scrollama event handlers
   scroller
     .setup({
       container: '#scroll1', // our outermost scrollytelling element
@@ -268,33 +237,21 @@ function init() {
       debug: false, // display the trigger offset for testing
     })
     .onStepEnter(handleStepEnter);
-  // .onContainerEnter(handleContainerEnter)
-  // .onContainerExit(handleContainerExit);
 
   // setup resize event
   window.addEventListener('resize', handleResize);
 }
 
-// function updateMap() {}
-
 function fullMapVis(files) {
   const width = 920;
   const height = 800;
-  const xDim = 'countyFIPS';
-  const yDim = 'Value';
   const data = files[0];
   const counties = files[1];
   const states = files[2];
-  const deaths = files[3];
   const cumul_deaths = files[4];
   const boxes = files[5];
-  const vizBoxes = files[6];
   const vizDeaths = files[7];
   const stateMap = files[8];
-  // const years = Object.keys(boxes);
-  // const numBoxes = Object.values(boxes);
-  // console.log('boxes are...');
-  // console.log(boxes);
 
   window.globAirData = data;
   window.globCounties = counties;
@@ -302,44 +259,15 @@ function fullMapVis(files) {
   window.globStateMap = stateMap;
 
   // Map and projection
-  // console.log('past path!');
   const projection = geoAlbersUsa();
   const path = geoPath().projection(projection);
-
-  // console.log('past projection!');
-  // console.log('here are states!');
-  // console.log(states);
-
-  // console.log('past color scale!');
-  // console.log(
-  //   counties.features[0].properties.STATE +
-  //     counties.features[0].properties.COUNTY,
-  // );
-
-  // .orient('horizontal');
 
   // Create svg
   const svg = select('#vis1')
     .append('svg')
-    // .attr('viewBox', [0, 0, 975, 610]);
-    // .attr('viewBox', `0 0 ${height} ${width}`);
     .attr('height', height)
     .attr('width', width)
     .attr('transform', 'translate(180, 0)');
-
-  // console.log('here I am!');
-
-  //Bind data and create one path per GeoJSON feature
-  // used https://observablehq.com/@d3/choropleth
-  // svg
-  //   .append('g')
-  //   .selectAll('path')
-  //   // .data(counties.features)
-  //   .enter()
-  //   .append('path')
-  //   .attr('fill', 'grey')
-  //   .attr('d', path)
-  //   .attr('transform', 'translate(-80, 50) scale(0.9)');
 
   svg
     .append('g')
@@ -365,14 +293,6 @@ function fullMapVis(files) {
 ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
     );
 
-  // console.log('counties are...');
-  // console.log(counties);
-  //
-  // console.log('states are...');
-  // console.log(states);
-
-  // counties.features.properties.NAME
-
   svg
     .append('g')
     .selectAll('path')
@@ -395,7 +315,6 @@ ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
     .text('Fine particulate (PM2.5) concentrations by county in...')
     .style('font-size', '20px')
     .attr('class', 'map-title');
-  // .style('font-weight', 800);
 
   svg
     .append('text')
@@ -436,17 +355,9 @@ ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
     return boxNums;
   }
 
-  // console.log('viz boxes is...');
-  // console.log(vizBoxes);
-  // var boxData = rectArray(vizBoxes);
   var boxData = rectArray(boxes);
-  // console.log('box data is...');
-  // console.log(boxData);
   window.numBoxes = boxData;
-  // window.numDeaths = vizDeaths;
   window.numDeaths = cumul_deaths;
-  // console.log('box data is...');
-  // console.log(boxData);
 
   const width_waf = squareSize * widthSquares + widthSquares * gap + 200;
   const height_waf = squareSize * heightSquares + heightSquares * gap + 175;
@@ -455,8 +366,6 @@ ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
     .append('svg')
     .attr('width', width_waf)
     .attr('height', height_waf);
-  // .attr('transform', 'translate(0, 35)');
-  // .attr('transform', 'translate(1000, -350)');
 
   waffle
     .append('g')
@@ -470,8 +379,6 @@ ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
     .attr('x', function(d, i) {
       //group n squares for column
       var col = Math.floor(i / heightSquares);
-      // console.log('i is...');
-      // console.log(i);
       return col * squareSize + col * gap;
     })
     .attr('y', function(d, i) {
@@ -532,6 +439,10 @@ ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
   mapZoom();
 }
 
+// needed to copy scrollama functions below; couldn't figure out how to
+// use just one set of functions for the two sets of scrolly animations
+// on the page
+
 // resize function to set dimensions on load and on page resize
 function handleResize2() {
   // 1. update height of step elements for breathing room between steps
@@ -561,13 +472,14 @@ function handleResize2() {
 // scrollama event handlers
 function handleStepEnter2(response) {
   // x is leftmost point, y is topmost point
-  // { x: 31.287342071533203, y: 9.64207649230957, width: 835.5782470703125, height: 487.91693115234375 }
-  // CA: [[32, 170], [90, 400]]
-  // response = { element, direction, index }
-  // fade in current step
-  // const [[left, top], [right, bottom]]
-  // const [[x0, y0], [x1, y1]] = path.bounds(d);
+  // bounding box for US map is:
+  // { x: 31.287342071533203, y: 9.64207649230957,
+  // width: 835.5782470703125, height: 487.91693115234375 }
 
+  // how to interpret bounding boxes below:
+  // const [[left, top], [right, bottom]]
+
+  // define bounding boxes of parts of US map to zoom in on
   var boundBoxes = new Array();
   const us = [
     [52, 40],
@@ -594,20 +506,15 @@ function handleStepEnter2(response) {
     [375, 495],
   ];
 
+  // add bounding boxes to list in the order I want to call them
   boundBoxes.push(us);
   boundBoxes.push(cali);
   boundBoxes.push(midwest);
   boundBoxes.push(southeast);
   boundBoxes.push(hawaii);
-  // boundBoxes.push(us);
   boundBoxes.push(us);
 
-  // southeast
-  // const [[x0, y0], [x1, y1]] = [
-  //   [600, 285],
-  //   [720, 440],
-  // ];
-
+  // zoom into a region of the map based on value of current step
   const [[x0, y0], [x1, y1]] = boundBoxes[response.index];
 
   const width = 1000;
@@ -622,45 +529,16 @@ function handleStepEnter2(response) {
     return i === response.index;
   });
 
-  // console.log('response index 2! is...');
-  // console.log(response.index);
-
-  // chart2.call(zoom)
-  // .transition()
-  // .duration(200)
-  // .zoom.transform,
-  // zoomIdentity,
-
   chart2
     .selectAll('path')
     .transition()
     .duration(800)
     .attr('transform', transform);
-
-  // chart2
-  //   .selectAll('path')
-  //   .transition()
-  //   .duration(600)
-  //   .attr('transform', zoomIdentity);
-
-  // chart2
-  //   .selectAll('path')
-  //   .data(window.globCounties.features)
-  //   .transition()
-  //   .duration(200)
-  //   .attr('fill', d =>
-  //     colorScale(
-  //       window.globAirData[years[response.index]][
-  //         +(d.properties.STATE + d.properties.COUNTY)
-  //       ],
-  //     ),
-  //   );
 }
 
 // kick-off code to run once on load
 function init2() {
   // 1. call a resize on load to update width/height/position of elements
-  // setupStickyfill();
   handleResize2();
 
   // 2. setup the scrollama instance
@@ -675,13 +553,12 @@ function init2() {
       debug: false, // display the trigger offset for testing
     })
     .onStepEnter(handleStepEnter2);
-  // .onContainerEnter(handleContainerEnter)
-  // .onContainerExit(handleContainerExit);
 
   // setup resize event
   window.addEventListener('resize', handleResize2);
 }
 
+// create map that will be zoomed in on
 function mapZoom() {
   const width = 1000;
   const height = 500;
@@ -762,16 +639,5 @@ ${window.globAirData[2016][+(d.properties.STATE + d.properties.COUNTY)]}`,
     .call(colorLegend)
     .attr('transform', 'translate(15, 20)');
 
-  // svg
-  //   .append('text')
-  //   .attr('text-anchor', 'start')
-  //   .attr('y', 500)
-  //   .attr('x', 50)
-  //   .text('Source: Center for Disease Control and Prevention')
-  //   .style('font-size', '14px')
-  //   .style('fill', '#808080');
-
-  // console.log('bounding box is...');
-  // console.log(svg.node().getBBox());
   init2();
 }
