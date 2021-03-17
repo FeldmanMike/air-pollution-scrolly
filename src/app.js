@@ -109,7 +109,7 @@ function handleResize() {
   graphic.style('height', window.innerHeight + 'px');
 
   // 3. update width of chart by subtracting from text width
-  var chartMargin = 32;
+  var chartMargin = 250;
   var textWidth = text.node().offsetWidth;
   var chartWidth = graphic.node().offsetWidth - textWidth - chartMargin;
 
@@ -244,7 +244,7 @@ function init() {
 
 function fullMapVis(files) {
   const width = 920;
-  const height = 800;
+  const height = 600;
   const data = files[0];
   const counties = files[1];
   const states = files[2];
@@ -266,8 +266,8 @@ function fullMapVis(files) {
   const svg = select('#vis1')
     .append('svg')
     .attr('height', height)
-    .attr('width', width)
-    .attr('transform', 'translate(180, 0)');
+    .attr('width', width);
+  // .attr('transform', 'translate(180, 0)');
 
   svg
     .append('g')
@@ -329,9 +329,18 @@ ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
   svg
     .append('text')
     .attr('text-anchor', 'start')
-    .attr('y', 570)
+    .attr('y', 540)
     .attr('x', 0)
-    .text('Source: Center for Disease Control and Prevention')
+    .text('Source: Centers for Disease Control and Prevention')
+    .style('font-size', '14px')
+    .style('fill', '#808080');
+
+  svg
+    .append('text')
+    .attr('text-anchor', 'start')
+    .attr('y', 557)
+    .attr('x', 0)
+    .text('Death estimates only available for 2001-2014')
     .style('font-size', '14px')
     .style('fill', '#808080');
 
@@ -393,7 +402,7 @@ ${data[yearOne][+(d.properties.STATE + d.properties.COUNTY)]}`,
     .attr('text-anchor', 'middle')
     .attr('y', 15)
     .attr('x', 230)
-    .text('If PM2.5 concentrations reduced by 25%')
+    .text('If PM2.5 levels were 25% lower')
     .style('font-size', '20px');
 
   waffle
@@ -625,6 +634,15 @@ ${window.globAirData[2016][+(d.properties.STATE + d.properties.COUNTY)]}`,
     .attr('fill', '#dbdbdb');
 
   svg
+    .append('rect')
+    .attr('y', 462)
+    .attr('x', 2)
+    .attr('height', 38)
+    .attr('width', 336)
+    .attr('opacity', 0.55)
+    .attr('fill', '#dbdbdb');
+
+  svg
     .append('text')
     .attr('text-anchor', 'middle')
     .attr('y', 30)
@@ -633,6 +651,24 @@ ${window.globAirData[2016][+(d.properties.STATE + d.properties.COUNTY)]}`,
     .style('font-size', '26px')
     .attr('class', 'map-title')
     .style('font-weight', 800);
+
+  svg
+    .append('text')
+    .attr('text-anchor', 'start')
+    .attr('y', 479)
+    .attr('x', 8)
+    .text('Source: Centers for Disease Control and Prevention')
+    .style('font-size', '14px')
+    .style('fill', '#808080');
+
+  svg
+    .append('text')
+    .attr('text-anchor', 'start')
+    .attr('y', 494)
+    .attr('x', 8)
+    .text('Note: 2016 is the latest year of available data')
+    .style('font-size', '14px')
+    .style('fill', '#808080');
 
   svg
     .append('g')

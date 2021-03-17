@@ -42,6 +42,7 @@ body {
   width: 100%;
   transform: translateY(13%);
   align-items: center;
+  margin-left: 15%
 }
 
 .scroll__text, .scroll__text2 {
@@ -96,8 +97,9 @@ body {
 
 #vis1 {
   margin-left: auto;
-  min-width: 950px;
-  max-width: 1000px;
+  min-width: 770px;
+  max-width: 800px;
+  max-height: 600px;
 }
 
 #waffle {
@@ -116,12 +118,12 @@ body {
   margin-bottom: 2%;
 }
 
-#header {
+/* #header {
     background-color: #ececec;
     height: 50px;
     width: 100%;
     margin-bottom: 2%;
-}
+} */
 
 #title-container {
   display: flex;
