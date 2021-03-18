@@ -109,7 +109,7 @@ function handleResize() {
   graphic.style('height', window.innerHeight + 'px');
 
   // 3. update width of chart by subtracting from text width
-  var chartMargin = 250;
+  var chartMargin = 32;
   var textWidth = text.node().offsetWidth;
   var chartWidth = graphic.node().offsetWidth - textWidth - chartMargin;
 

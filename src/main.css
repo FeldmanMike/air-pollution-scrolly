@@ -42,7 +42,7 @@ body {
   width: 100%;
   transform: translateY(13%);
   align-items: center;
-  margin-left: 15%
+  margin-left: 12%
 }
 
 .scroll__text, .scroll__text2 {
@@ -96,14 +96,14 @@ body {
 }
 
 #vis1 {
-  margin-left: auto;
+  /* margin-left: auto; */
   min-width: 770px;
   max-width: 800px;
   max-height: 600px;
 }
 
 #waffle {
-  margin-left: auto;
+  /* margin-left: auto; */
   max-width: 900px;
 }
 
